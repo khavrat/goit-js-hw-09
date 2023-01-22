@@ -6,31 +6,23 @@ const inputStep = document.querySelector('input[name="step"]');
 const inputAmount = document.querySelector('input[name="amount"]');
 const btn = document.querySelector('button');
 
-form.addEventListener('input', onFormDataValue);
-form.addEventListener('submit', createPromise);
-btn.addEventListener('submit', onFormSubmit);
+form.addEventListener('submit', onFormSubmit);
 
-const STORAGE_KEY = 'form-state';
+let delay = '';
+let amount = '';
+let step = '';
 
-const formData = {};
-
-function onFormDataValue(e) {
-  formData[e.target.name] = e.target.value;
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(formData));
+function onFormSubmit(e) {
+  if (e && e.preventDefault) e.preventDefault();
+  delay = Number(inputDelay.value);
+  amount = Number(inputAmount.value);
+  step = Number(inputStep.value);
+  
+  for (let i = 1; i <= amount; i += 1) {
+    setTimeout(iterationPromise, step, i);
+  }
 }
 
-function getSavedFormData() {
-  const parsedData = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
-  formData.delay = parsedData.delay || '';
-  formData.step = parsedData.step || '';
-  formData.amount = parsedData.amount || '';
-}
-
-getSavedFormData();
-
-let delay = Number(formData.delay);
-let amount = Number(formData.amount);
-let step = Number(formData.step);
 
 function createPromise(position, delay) {
   const shouldResolve = Math.random() > 0.3;
@@ -66,24 +58,6 @@ function iterationPromise(amount) {
     });
   delay += step;
 }
-
-for (let i = 1; i <= amount; i += 1) {
-  setTimeout(iterationPromise, step, i);
-}
-
-function onFormSubmit(e) {
-  localStorage.removeItem(STORAGE_KEY);
-
-  const { delay, step, amount } = formData;
-  inputDelay.value = delay;
-  inputStep.value = step;
-  inputAmount.value = amount;
-
-  document.removeEventListener('submit', createPromise);
-  document.removeEventListener('input', onFormDataValue);
-}
-
-onFormSubmit();
 
 // styling elements
 form.style.cssText =
